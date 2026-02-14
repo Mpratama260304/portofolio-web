@@ -681,7 +681,10 @@
   <canvas id="magic-canvas"></canvas>
 
   <!-- Background Audio -->
-  <audio id="bg-audio" preload="auto" playsinline loop></audio>
+  <audio id="bg-audio" preload="auto" playsinline loop>
+    <source src="auraofglory.mp3" type="audio/mpeg">
+    <source src="https://pub-28ef6a5a376f424987c4fcdf855a8fe4.r2.dev/auraofglory.mp3" type="audio/mpeg">
+  </audio>
 
   <!-- Fallback Audio Modal -->
   <div id="audio-fallback-modal" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
@@ -1122,14 +1125,30 @@
     let audioUnlocked = false;
 
     // Set audio source via JS and load
-    bgAudio.src = 'https://pub-28ef6a5a376f424987c4fcdf855a8fe4.r2.dev/auraofglory.mp3';
+    // If <source> already loaded, just configure; otherwise set src as fallback
+    if (!bgAudio.src && !bgAudio.querySelector('source')) {
+      bgAudio.src = 'auraofglory.mp3';
+    }
     bgAudio.load();
     bgAudio.volume = 0.6;
     bgAudio.muted = false;
 
-    // Error event debugging
+    // Error event debugging — try fallback src on first error
+    let audioRetried = false;
     bgAudio.addEventListener('error', (e) => {
       const err = bgAudio.error;
+
+      // On first error, retry: remove <source>, set local src directly
+      if (!audioRetried) {
+        audioRetried = true;
+        console.warn('[Audio] First load failed, retrying with direct src...');
+        const sources = bgAudio.querySelectorAll('source');
+        sources.forEach(s => s.remove());
+        bgAudio.src = 'auraofglory.mp3?t=' + Date.now();
+        bgAudio.load();
+        return;
+      }
+
       let msg = 'Audio error: ';
       if (err) {
         switch (err.code) {
