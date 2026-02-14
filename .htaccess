@@ -1,1 +1,93 @@
 ErrorDocument 404 /404.html
+
+# ===== PERFORMANCE OPTIMIZATIONS =====
+
+# Enable GZIP Compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+  AddOutputFilterByType DEFLATE text/javascript application/javascript application/x-javascript
+  AddOutputFilterByType DEFLATE application/json application/xml
+  AddOutputFilterByType DEFLATE image/svg+xml
+  AddOutputFilterByType DEFLATE font/woff2 font/woff font/ttf
+</IfModule>
+
+# Enable Brotli Compression (if available)
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/css text/xml
+  AddOutputFilterByType BROTLI_COMPRESS text/javascript application/javascript
+  AddOutputFilterByType BROTLI_COMPRESS application/json application/xml
+  AddOutputFilterByType BROTLI_COMPRESS image/svg+xml
+</IfModule>
+
+# Browser Caching with Cache-Control headers
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # HTML - short cache (may change frequently)
+  ExpiresByType text/html "access plus 1 hour"
+
+  # Images - long cache
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/gif "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/x-icon "access plus 1 year"
+
+  # CSS & JavaScript
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType text/javascript "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+
+  # Fonts
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType font/woff "access plus 1 year"
+  ExpiresByType font/ttf "access plus 1 year"
+  ExpiresByType application/font-woff2 "access plus 1 year"
+  ExpiresByType application/font-woff "access plus 1 year"
+
+  # Audio/Video
+  ExpiresByType audio/mpeg "access plus 1 year"
+  ExpiresByType video/mp4 "access plus 1 year"
+
+  # Default
+  ExpiresDefault "access plus 1 month"
+</IfModule>
+
+# Cache-Control headers
+<IfModule mod_headers.c>
+  # Immutable assets (images, audio, fonts)
+  <FilesMatch "\.(webp|png|jpg|jpeg|gif|svg|ico|mp3|mp4|woff2|woff|ttf|eot)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # CSS and JS
+  <FilesMatch "\.(css|js)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # HTML - revalidate
+  <FilesMatch "\.(html|htm)$">
+    Header set Cache-Control "public, max-age=3600, must-revalidate"
+  </FilesMatch>
+
+  # Security headers
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# WebP MIME type
+<IfModule mod_mime.c>
+  AddType image/webp .webp
+</IfModule>
+
+# Enable Keep-Alive
+<IfModule mod_headers.c>
+  Header set Connection keep-alive
+</IfModule>
+
+# ETags - use file modification time
+<IfModule mod_headers.c>
+  FileETag MTime Size
+</IfModule>

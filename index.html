@@ -19,28 +19,44 @@
   <meta name="twitter:description" content="CV dan portofolio bertema fantasy arcane." />
   <meta name="twitter:image" content="https://pub-28ef6a5a376f424987c4fcdf855a8fe4.r2.dev/fantasy-arcane-cv-favicon-512.png" />
 
+  <!-- Preconnect to critical origins -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://unpkg.com" crossorigin />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    try {
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: { poppins: ['Poppins','sans-serif'], cinzel: ['Cinzel','serif'] },
-            colors: {
-              cv: { blue:'#1e3a5f', blueDark:'#0d1b2a', blueLight:'#2a5080', accent:'#7eb8e3', gold:'#d4a843', violet:'#6c3fa0', rose:'#a04070' }
+  <!-- Preload LCP image (smallest WebP for fastest load) -->
+  <link rel="preload" as="image" type="image/webp" href="self-300.webp" fetchpriority="high" 
+        imagesrcset="self-300.webp 300w, self-400.webp 400w, self-600.webp 600w, self.webp 1024w"
+        imagesizes="(max-width: 767px) 110px, 144px" />
+
+  <!-- Google Fonts: non-render-blocking with swap -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Cinzel:wght@400;700&display=swap" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Cinzel:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Cinzel:wght@400;700&display=swap" rel="stylesheet" /></noscript>
+
+  <!-- Tailwind CSS: defer to not block render -->
+  <script defer src="https://cdn.tailwindcss.com"></script>
+  <script defer>
+    document.addEventListener('DOMContentLoaded', function() {
+      try {
+        if (typeof tailwind !== 'undefined') {
+          tailwind.config = {
+            theme: {
+              extend: {
+                fontFamily: { poppins: ['Poppins','sans-serif'], cinzel: ['Cinzel','serif'] },
+                colors: {
+                  cv: { blue:'#1e3a5f', blueDark:'#0d1b2a', blueLight:'#2a5080', accent:'#7eb8e3', gold:'#d4a843', violet:'#6c3fa0', rose:'#a04070' }
+                }
+              }
             }
-          }
+          };
         }
-      };
-    } catch(e) {}
+      } catch(e) {}
+    });
   </script>
 
-  <!-- Three.js for 3D Book Viewer -->
-  <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+  <!-- Three.js importmap (modules loaded lazily on demand) -->
   <script type="importmap">
     {
       "imports": {
@@ -50,8 +66,7 @@
     }
   </script>
 
-  <!-- html2canvas for Screenshot -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- html2canvas loaded on demand (not render-blocking) -->
 
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -680,8 +695,8 @@
   <canvas id="star-canvas"></canvas>
   <canvas id="magic-canvas"></canvas>
 
-  <!-- Background Audio -->
-  <audio id="bg-audio" preload="auto" playsinline loop>
+  <!-- Background Audio (preload=none to save bandwidth) -->
+  <audio id="bg-audio" preload="none" playsinline loop>
     <source src="auraofglory.mp3" type="audio/mpeg">
     <source src="https://pub-28ef6a5a376f424987c4fcdf855a8fe4.r2.dev/auraofglory.mp3" type="audio/mpeg">
   </audio>
@@ -755,15 +770,25 @@
         <div class="flex flex-col items-center pt-10 pb-6 px-6 fade-in">
           <div class="rounded-full overflow-hidden flex items-center justify-center mb-5 relative" style="width:144px; height:144px; border:3px solid rgba(212,168,67,0.25); box-shadow:0 0 30px rgba(108,63,160,0.3), inset 0 0 20px rgba(126,184,227,0.1);">
             <div class="absolute inset-0 rounded-full" style="background:radial-gradient(circle, rgba(42,80,128,0.15) 0%, rgba(13,27,42,0.3) 100%); z-index:2; pointer-events:none;"></div>
-            <img
-              id="profile-photo"
-              loading="eager"
-              decoding="sync"
-              src="self.png"
-              alt="Foto Mochamad Pratama Mukti"
-              style="width:100%; height:100%; object-fit:cover; object-position:center 15%; position:absolute; inset:0; z-index:1;"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
-            />
+            <picture>
+              <source
+                type="image/webp"
+                srcset="self-300.webp 300w, self-400.webp 400w, self-600.webp 600w, self.webp 1024w"
+                sizes="(max-width: 767px) 110px, 144px"
+              />
+              <img
+                id="profile-photo"
+                loading="eager"
+                decoding="async"
+                fetchpriority="high"
+                src="self.png"
+                alt="Foto Mochamad Pratama Mukti"
+                width="400"
+                height="600"
+                style="width:100%; height:100%; object-fit:cover; object-position:center 15%; position:absolute; inset:0; z-index:1;"
+                onerror="this.style.display='none'; this.parentElement.nextElementSibling.style.display='block';"
+              />
+            </picture>
             <svg width="80" height="80" viewBox="0 0 80 80" fill="none" style="opacity:0.4; position:relative; z-index:0; display:none;">
               <circle cx="40" cy="30" r="16" fill="white"></circle>
               <ellipse cx="40" cy="72" rx="28" ry="20" fill="white"></ellipse>
@@ -1044,9 +1069,33 @@
 
   <!-- MAIN SCRIPT -->
   <script type="module">
-    import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    // Three.js modules loaded lazily on demand
+    let THREE, OrbitControls, GLTFLoader;
+    let threeLoaded = false;
+
+    async function loadThreeJS() {
+      if (threeLoaded) return;
+      [THREE, { OrbitControls }, { GLTFLoader }] = await Promise.all([
+        import('three'),
+        import('three/addons/controls/OrbitControls.js'),
+        import('three/addons/loaders/GLTFLoader.js')
+      ]);
+      threeLoaded = true;
+    }
+
+    // html2canvas loaded lazily on demand
+    let html2canvasLoaded = false;
+    async function loadHtml2Canvas() {
+      if (html2canvasLoaded) return;
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+      html2canvasLoaded = true;
+    }
 
     // ========================================
     // UTILITY FUNCTIONS
@@ -1310,9 +1359,15 @@
 
       openModal('✦ 3D Book Viewer ✦', container, '520px', cleanupBookViewer);
 
-      // Wait for DOM to fully render so container has dimensions
-      setTimeout(() => {
-        initThreeScene();
+      // Load Three.js lazily, then init scene
+      setTimeout(async () => {
+        try {
+          await loadThreeJS();
+          initThreeScene();
+        } catch (e) {
+          console.error('Failed to load Three.js:', e);
+          showToast('Gagal memuat 3D viewer');
+        }
       }, 100);
     }
 
@@ -1822,6 +1877,9 @@
       try {
         showToast('Mengambil screenshot...');
 
+        // Load html2canvas on demand
+        await loadHtml2Canvas();
+
         // 1) Pre-convert profile photo to dataURL BEFORE cloning
         const profileImg = document.getElementById('profile-photo');
         let photoDataURL = null;
@@ -1955,7 +2013,8 @@
       starCanvas.width = window.innerWidth;
       starCanvas.height = window.innerHeight;
       stars = [];
-      const count = Math.floor((starCanvas.width * starCanvas.height) / 8000);
+      // Reduced star count for better performance
+      const count = Math.min(Math.floor((starCanvas.width * starCanvas.height) / 16000), 100);
       for (let i = 0; i < count; i++) {
         stars.push({
           x: Math.random() * starCanvas.width,
